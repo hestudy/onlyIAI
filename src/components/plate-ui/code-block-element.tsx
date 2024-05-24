@@ -1,19 +1,18 @@
 "use client";
 
-import React from "react";
-
 import { cn, withRef } from "@udecode/cn";
 import { useCodeBlockElementState } from "@udecode/plate-code-block";
-import { PlateElement } from "@udecode/plate-common";
+import { PlateElement, getNodeTexts } from "@udecode/plate-common";
 
-import { CodeBlockCombobox } from "./code-block-combobox";
-
+import { Check, Copy } from "lucide-react";
 import "./code-block-element.css";
+import { useBoolean } from "ahooks";
 
 export const CodeBlockElement = withRef<typeof PlateElement>(
   ({ children, className, ...props }, ref) => {
     const { element } = props;
     const state = useCodeBlockElementState({ element });
+    const [success, successAc] = useBoolean(false);
 
     return (
       <PlateElement
@@ -25,14 +24,27 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
           <code>{children}</code>
         </pre>
 
-        {state.syntax && (
-          <div
-            className="absolute right-2 top-2 z-10 select-none"
-            contentEditable={false}
-          >
-            <CodeBlockCombobox />
-          </div>
-        )}
+        <div
+          className="absolute right-2 top-4 z-10 select-none cursor-pointer"
+          onClick={() => {
+            navigator.clipboard
+              .writeText(
+                Array.from(getNodeTexts(props.element))
+                  .map((t) => t[0].text)
+                  .join("\n")
+              )
+              .then(() => {
+                successAc.setTrue();
+                setTimeout(() => {
+                  successAc.setFalse();
+                }, 1000);
+              });
+          }}
+          contentEditable={false}
+        >
+          {success && <Check className="size-4 text-green-500" />}
+          {!success && <Copy className="size-4" />}
+        </div>
       </PlateElement>
     );
   }

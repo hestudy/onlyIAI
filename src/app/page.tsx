@@ -45,8 +45,8 @@ export default function Page() {
   }, [message]);
 
   return (
-    <div className="h-full container mx-auto p-2">
-      <div className="flex flex-col h-full bg-gray-100 rounded">
+    <div className="h-full md:w-[80%] lg:w-[70%] xl:w-[60%] mx-auto p-2">
+      <div className="flex flex-col h-full bg-gray-100 rounded p-2">
         <div className="flex-1 h-0 overflow-y-auto">
           {message.map((item) => {
             return (

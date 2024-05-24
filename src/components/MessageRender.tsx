@@ -13,6 +13,7 @@ import {
   createPlugins,
   findNode,
   findNodePath,
+  focusEditor,
   getLastChild,
   getLastChildPath,
   getLastNode,
@@ -25,17 +26,19 @@ import {
   deserializeMd,
 } from "@udecode/plate-serializer-md";
 import { useEffect, useRef } from "react";
-import ParagraphElement from "./ParagraphElement";
 import { CodeBlockElement } from "./plate-ui/code-block-element";
 import { CodeLineElement } from "./plate-ui/code-line-element";
 import { CodeSyntaxLeaf } from "./plate-ui/code-syntax-leaf";
 import { Editor } from "./plate-ui/editor";
+import { ParagraphElement } from "./plate-ui/paragraph-element";
+import { createCustomNormalizerPlugin } from "@/plugins/customNormalizePlugin";
 
 const plugins = createPlugins(
   [
     createBasicElementsPlugin(),
     createBasicMarksPlugin(),
     createDeserializeMdPlugin(),
+    createCustomNormalizerPlugin(),
   ],
   {
     components: {
@@ -53,19 +56,11 @@ const MessageRender = (props: { md: string }) => {
   useEffect(() => {
     if (editorRef.current) {
       const fragment = deserializeMd(editorRef.current, props.md);
+      console.log(fragment);
       if (fragment) {
-        const children = editorRef.current.children;
-        const length = children.length;
-        const lastChild = children[length - 1];
-        const path = findNodePath(editorRef.current, lastChild);
-        console.log(path);
-
         editorRef.current.select({
-          anchor: { path: [0, 0], offset: 0 },
-          focus: {
-            path: path || [0, 0],
-            offset: 0,
-          },
+          anchor: editorRef.current.start([]),
+          focus: editorRef.current.end([]),
         });
         editorRef.current.insertFragment(fragment);
       }
