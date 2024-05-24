@@ -1,5 +1,6 @@
 "use server";
 
+import AiLoading from "@/components/AiLoading";
 import { createOpenAI } from "@ai-sdk/openai";
 import { CoreMessage, streamText } from "ai";
 import { createStreamableUI, createStreamableValue } from "ai/rsc";
@@ -32,12 +33,7 @@ export async function sendMessage(history: Message[]) {
   const aiState = createStreamableUI();
   const ui = createStreamableUI();
   (async () => {
-    aiState.update(
-      <div className="flex items-center space-x-1">
-        <Loader className="animate-spin" />
-        <div className="text-[12px]">努力思考中...</div>
-      </div>
-    );
+    aiState.update(<AiLoading></AiLoading>);
     const { fullStream } = await streamText({
       model: openai("gpt-3.5-turbo"),
       system: "你是一位陪伴人类玩耍的小狗",

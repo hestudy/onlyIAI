@@ -7,6 +7,7 @@ import { nanoid } from "ai";
 import { readStreamableValue } from "ai/rsc";
 import { useEffect, useState } from "react";
 import { Message, sendMessage } from "./actions";
+import MessageRender from "@/components/MessageRender";
 
 export default function Page() {
   const [message, setMessage] = useState<Message[]>([]);
@@ -44,54 +45,56 @@ export default function Page() {
   }, [message]);
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex-1 h-0 overflow-y-auto">
-        {message.map((item) => {
-          return (
-            <div key={item.id} className="mb-2 p-2">
-              <div>{item.role}</div>
-              {item.content && (
-                <div className="p-2 rounded bg-gray-100">
-                  <MessageMarkDown content={item.content}></MessageMarkDown>
-                </div>
-              )}
-              {item.tool && (
-                <div className="text-[12px] bg-gray-100 rounded p-2 w-fit">
-                  {item.tool.name}：{item.tool.result}
-                </div>
-              )}
-            </div>
-          );
-        })}
-        {uiState}
-        {aiState}
-      </div>
-      <div className="p-2 h-[100px]">
-        <Textarea
-          value={value}
-          onChange={(e) => {
-            setValue(e.target.value);
-          }}
-          placeholder="今天想聊点什么呢？"
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              if (value) {
-                const history = [
-                  ...message,
-                  {
-                    id: nanoid(),
-                    content: value,
-                    role: "user",
-                  } as Message,
-                ];
-                setMessage(history);
-                run(history);
-                setValue("");
+    <div className="h-full container mx-auto p-2">
+      <div className="flex flex-col h-full bg-gray-100 rounded">
+        <div className="flex-1 h-0 overflow-y-auto">
+          {message.map((item) => {
+            return (
+              <div key={item.id} className="mb-2 p-2">
+                <div>{item.role}</div>
+                {item.content && (
+                  <div className="p-2 rounded bg-white w-fit max-w-full">
+                    <MessageRender md={item.content}></MessageRender>
+                  </div>
+                )}
+                {item.tool && (
+                  <div className="text-[12px] bg-gray-100 rounded p-2 w-fit max-w-full">
+                    {item.tool.name}：{item.tool.result}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+          {uiState}
+          {aiState}
+        </div>
+        <div className="p-2 h-[100px]">
+          <Textarea
+            value={value}
+            onChange={(e) => {
+              setValue(e.target.value);
+            }}
+            placeholder="今天想聊点什么呢？"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                if (value) {
+                  const history = [
+                    ...message,
+                    {
+                      id: nanoid(),
+                      content: value,
+                      role: "user",
+                    } as Message,
+                  ];
+                  setMessage(history);
+                  run(history);
+                  setValue("");
+                }
               }
-            }
-          }}
-        ></Textarea>
+            }}
+          ></Textarea>
+        </div>
       </div>
     </div>
   );
